@@ -83,18 +83,6 @@ for(int i = 0; i < k; i++)                                              //Calcul
     }*/
 }
 
-void knn::set_training_data(std::vector<data *> *vect)
-{
-    training_data = vect;
-}
-void knn::set_test_data(std::vector<data *> *vect)
-{
-    test_data = vect;
-}
-void knn::set_validation_data(std::vector<data *> *vect)
-{
-    validation_data = vect;
-}
 void knn::set_k(int val)
 {
     k = val;
@@ -205,41 +193,4 @@ double knn::test_performance()
     }
     std::cout << "Test performance = " << ((double)count * 100)/(test_data->size()) << "%" << std::endl;
     return ((double)count * 100)/(test_data->size());
-}
-
-int main()
-{
-    data_handler* dh = new data_handler();
-    dh->read_feature_vector("../data/train-images.idx3-ubyte");
-    dh->read_feature_labels("../data/train-labels.idx1-ubyte");
-    dh->split_data();
-    dh->count_classes();
-    knn* knearest = new knn(1);
-    knearest->set_training_data(dh->get_training_data());
-    knearest->set_test_data(dh->get_test_data());
-    knearest->set_validation_data(dh->get_validation_data());
-    double performance = 0;
-    double best_performance = 0;
-    int best_k = 1;
-    for(int i = 1; i < 5  ; i++)
-    {
-        if(i == 1)
-        {
-            knearest->set_k(i);
-            performance = knearest->validate_performance();
-            best_performance = performance;
-        }
-        else
-        {
-            knearest->set_k(i);
-            performance = knearest->validate_performance();
-            if(performance > best_performance)
-            {
-                best_performance = performance;
-                best_k = i;
-            }
-        }
-    }
-    knearest->set_k(best_k);
-    knearest->test_performance();
 }
