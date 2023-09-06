@@ -18,6 +18,9 @@ public:
     void read_feature_labels(std::string path);
     void split_data();
     void count_classes();
+    void set_train_percent(double train_percent);
+    void set_test_percent(double test_percent);
+    void set_validation_percent(double validation_percent);
 
     uint32_t convert_to_little_endian(const unsigned char* bytes);
 
@@ -26,6 +29,10 @@ public:
     std::vector<data *> * get_validation_data();
 
 private:
+    double TRAIN_SET_PERCENT;
+    double TEST_SET_PERCENT;
+    double VALIDATION_SET_PERCENT;
+
     std::vector<data *> * data_array;
     std::vector<data *> * training_data;
     std::vector<data *> * test_data;
@@ -34,10 +41,6 @@ private:
     int num_classes;
     int feature_vector_size;
     std::map<uint8_t, int> class_map;
-    
-    const double TRAIN_SET_PERCENT = 0.75;
-    const double TEST_SET_PERCENT = 0.20;
-    const double VALIDATION_SET_PERCENT = 0.05;
 };
 
 

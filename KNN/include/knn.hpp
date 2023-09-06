@@ -7,7 +7,7 @@
 class knn
 {
 public:
-    knn(int k);
+    knn(int val);
     knn();
     ~knn();
 
@@ -15,7 +15,7 @@ public:
     void set_training_data(std::vector<data *> * vect);
     void set_test_data(std::vector<data *> * vect);
     void set_validation_data(std::vector<data *> * vect);
-    void set_k(int k);
+    void set_k(int val);
     
     int predict();
     double calculate_distance(data * query_point, data * input);

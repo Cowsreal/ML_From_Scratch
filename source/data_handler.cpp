@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <random>
 
-data_handler::data_handler()
+data_handler::data_handler() : TRAIN_SET_PERCENT(0.75), TEST_SET_PERCENT(0.2), VALIDATION_SET_PERCENT(0.05)
 {
     data_array = new std::vector<data *>;
     test_data = new std::vector<data *>;
@@ -66,7 +66,7 @@ void data_handler::read_feature_vector(std::string path)
 }
 void data_handler::read_feature_labels(std::string path)
 {
-    uint32_t header[2];// MAGIC NUMBER|NUM IMAGES|ROW SIZE|COLUMN SIZE
+    uint32_t header[2];// MAGIC NUMBER|NUM IMAGES|
     unsigned char bytes[4];
     FILE *f = fopen(path.c_str(), "rb");
     if(f)
@@ -150,6 +150,19 @@ void data_handler::count_classes()
     std::cout << "Successfully extracted " << num_classes << " unique classes.\n";
 }
 
+void data_handler::set_train_percent(double train_percent)
+{
+    TRAIN_SET_PERCENT = train_percent;
+}
+void data_handler::set_test_percent(double test_percent)
+{
+    TEST_SET_PERCENT = test_percent;
+}
+void data_handler::set_validation_percent(double validation_percent)
+{
+    VALIDATION_SET_PERCENT = validation_percent;
+}
+
 uint32_t data_handler::convert_to_little_endian(const unsigned char* bytes)
 {
     return (uint32_t) ((bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | (bytes[3]));
@@ -168,6 +181,7 @@ std::vector<data *> * data_handler::get_validation_data()
     return validation_data;
 }
 
+/*
 int main()
 {
     data_handler *dh = new data_handler();
@@ -177,4 +191,4 @@ int main()
     dh->count_classes();
     delete dh;
     return 0;
-}
+}*/
