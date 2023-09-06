@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 11)
 project(ML_FROM_SCRATCH VERSION 0.1.0 LANGUAGES C CXX)
-add_compile_options(-shared -std=c++11 -D EUCLID)
+add_compile_options(-shared -std=c++11 -D MANHATTAN)
 
 set(SOURCE_FILES_DATA_HANDLER
     ${CMAKE_CURRENT_SOURCE_DIR}/source/data.cpp

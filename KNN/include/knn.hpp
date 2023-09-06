@@ -15,6 +15,7 @@ public:
     void set_training_data(std::vector<data *> * vect);
     void set_test_data(std::vector<data *> * vect);
     void set_validation_data(std::vector<data *> * vect);
+    
     void set_k(int val);
     
     int predict();

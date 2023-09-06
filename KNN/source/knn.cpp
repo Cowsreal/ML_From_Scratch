@@ -5,6 +5,8 @@
 #include <iostream>
 #include "data_handler.hpp"
 #include <thread>
+#include <algorithm>
+#include <chrono>
 
 knn::knn(int val)
 {
@@ -23,12 +25,31 @@ knn::~knn()
 //If k is very small, then approximately, the time complexity is O(~N)
 //However, we can sort the data in ascending order, and the time complexity of STL sort is O(NlogN), we then perform a linear search, but N < NlogN, so the overall time complexity is O(NlogN)
 
+bool comp(data* a, data* b)                                             //Comparator function for sorting by distances
+{
+    return a->get_distance() < b->get_distance();
+}
+
 void knn::find_knearest(data *query_point)
 {
     neighbors = new std::vector<data *>;
-    double min = std::numeric_limits<double>::max();        //STL for max value of type double
+    double min = std::numeric_limits<double>::max();                    //STL for max value of type double
     double previous_min = min;
     int idx;
+for(int i = 0; i < k; i++)                                              //Calculate distance between query_point and every training data point
+    {
+        for(int j = 0; j < training_data->size(); j++)
+        {
+            double distance = calculate_distance(query_point, (*training_data)[j]);
+            (*training_data)[j]->set_distance(distance);
+        }
+    }
+    std::sort((*training_data).begin(), (*training_data).end(), comp);  //Sort the training data by distance
+    for(int i = 0; i < k; i++)                                          //Loop thru k nearest neighbors
+    {
+        neighbors->push_back((*training_data)[i]);                      //Add the k nearest neighbors to neighbors vector
+    }
+    /*
     for(int i = 0; i < k; i++)
     {
         if(i == 0)
@@ -59,7 +80,7 @@ void knn::find_knearest(data *query_point)
         neighbors->push_back((*training_data)[idx]);
         previous_min = min;
         min = std::numeric_limits<double>::max();
-    }
+    }*/
 }
 
 void knn::set_training_data(std::vector<data *> *vect)
@@ -115,7 +136,9 @@ double knn::calculate_distance(data *query_point, data *input)
         std::cout << "Vector size mismatch" << std::endl;
         exit(1);
     }
-    #ifdef EUCLID
+    std::vector<uint8_t>* query_vec = query_point->get_feature_vector();
+    std::vector<uint8_t>* input_vec = input->get_feature_vector();
+    #ifdef EUCLID       //L2 NORM
         std::vector<uint8_t>* query_vec = query_point->get_feature_vector();
         std::vector<uint8_t>* input_vec = input->get_feature_vector();
         for(unsigned i = 0; i < query_point->get_feature_vector_size(); i++)
@@ -138,7 +161,11 @@ double knn::calculate_distance(data *query_point, data *input)
             }
         }
         distance = sqrt(distance);
-    #elif define MANHATTAN
+    #elif defined MANHATTAN     //L1 NORM.
+        for(unsigned i = 0; i < query_point->get_feature_vector_size(); i++)
+        {
+            distance += abs((*query_vec)[i] - (*input_vec)[i]);
+        }
     #endif
     return distance;
 }
@@ -155,7 +182,11 @@ double knn::validate_performance()
             count++;
         }
         data_idx++;
-        std::cout << "Current performance = " << ((double)count * 100)/(data_idx) << "%" << std::endl;
+        std::cout << "Current performance = " << ((double)count * 100)/(data_idx) << "%" << "(" << count << "/" << data_idx << "), k = " << k;
+        auto now = std::chrono::system_clock::now();
+        std::time_t current_time = std::chrono::system_clock::to_time_t(now);
+        // Convert the time to a string and print it
+        std::cout << "\nCurrent time is " << std::ctime(&current_time) << "\r" << "\r" << std::flush;
     }
     std::cout << "Validation performance = " << ((double)count * 100)/(data_idx) << "%" << " k = " << k << std::endl;
     return ((double)count * 100)/(data_idx);
@@ -190,11 +221,10 @@ int main()
     double performance = 0;
     double best_performance = 0;
     int best_k = 1;
-    for(int i = 1; i < 5; i++)
+    for(int i = 1; i < 5  ; i++)
     {
         if(i == 1)
         {
-            continue;
             knearest->set_k(i);
             performance = knearest->validate_performance();
             best_performance = performance;
