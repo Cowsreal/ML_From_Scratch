@@ -2,11 +2,11 @@
 #define __DATA_HANDLER_H
 
 #include <iostream>
-#include "data.hpp"
 #include <vector>
 #include <string>
 #include <map>
 #include <unordered_set>
+#include "data.hpp"
 
 class data_handler
 {
@@ -27,6 +27,7 @@ public:
     std::vector<data *> * get_training_data();
     std::vector<data *> * get_test_data();
     std::vector<data *> * get_validation_data();
+    int get_class_counts();
 
 private:
     double TRAIN_SET_PERCENT;

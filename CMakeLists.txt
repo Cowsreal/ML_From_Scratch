@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 11)
 project(ML_FROM_SCRATCH VERSION 0.1.0 LANGUAGES C CXX)
-add_compile_options(-shared -std=c++11 -DMANHATTAN -DDATA_HANDLER)
+add_compile_options(-shared -std=c++11 -DMANHATTAN -DKMEANS)
 
 set(SOURCE_FILES_MAIN
     ${CMAKE_CURRENT_SOURCE_DIR}/MAIN/source/main.cpp
@@ -19,6 +19,7 @@ set(SOURCE_FILES_KNN
 
 set(SOURCE_FILES_KMEANS
     ${CMAKE_CURRENT_SOURCE_DIR}/KMEANS/source/kmeans.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/KMEANS/source/cluster.cpp
 )
 
 add_library(DATA_HANDLER SHARED ${SOURCE_FILES_DATA_HANDLER})

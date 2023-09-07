@@ -180,3 +180,8 @@ std::vector<data *> * data_handler::get_validation_data()
 {
     return validation_data;
 }
+
+int data_handler::get_class_counts()
+{
+    return num_classes;
+}

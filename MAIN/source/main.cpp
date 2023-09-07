@@ -1,4 +1,21 @@
 #include "main.hpp"
+#include <iostream>
+#include <iomanip>
+
+#ifdef DATA_HANDLER
+int main()
+{
+    data *bye = new data();
+    cluster *hi = new cluster(bye);
+    data_handler *dh = new data_handler();
+    dh->read_feature_vector("../data/train-images.idx3-ubyte");
+    dh->read_feature_labels("../data/train-labels.idx1-ubyte");
+    dh->split_data();
+    dh->count_classes();
+    delete dh;
+    return 0;
+}
+#endif
 
 #ifdef KNN
 int main()
@@ -39,15 +56,39 @@ int main()
 }
 #endif
 
-#ifdef DATA_HANDLER
+#ifdef KMEANS
 int main()
 {
-    data_handler *dh = new data_handler();
+    data_handler* dh = new data_handler();
     dh->read_feature_vector("../data/train-images.idx3-ubyte");
     dh->read_feature_labels("../data/train-labels.idx1-ubyte");
     dh->split_data();
     dh->count_classes();
-    delete dh;
-    return 0;
+    double performance = 0;
+    double best_performance = 0;
+    int best_k = 1;
+    for(int k = dh->get_class_counts(); k < dh->get_training_data()->size() * 0.1; k++)
+    {
+        kmeans* km = new kmeans(k);
+        km->set_training_data(dh->get_training_data());
+        km->set_validation_data(dh->get_validation_data());
+        km->set_test_data(dh->get_test_data());
+        km->init_clusters();
+        km->train();
+        performance = km->validate();
+        std::cout << "Current Performance: " << std::setprecision(2) << std::fixed << performance << "%, k = " << k <<std::endl;
+        if(performance > best_performance)
+        {
+            best_performance = performance;
+            best_k = k;
+        }
+    }
+    kmeans* km = new kmeans(best_k);
+    km->set_training_data(dh->get_training_data());
+    km->set_validation_data(dh->get_validation_data());
+    km->set_test_data(dh->get_test_data());
+    km->init_clusters();
+    performance = km->test();
+    std::cout << "Test Performance: " << std::setprecision(2) << std::fixed << performance << "%, k = " << best_k <<std::endl;
 }
 #endif

@@ -1,12 +1,13 @@
-#include "knn.hpp"
 #include <cmath>
 #include <limits>
 #include <map>
 #include <iostream>
-#include "data_handler.hpp"
+#include <iomanip>
 #include <thread>
 #include <algorithm>
 #include <chrono>
+#include "knn.hpp"
+#include "data_handler.hpp"
 
 knn::knn(int val)
 {
@@ -170,13 +171,13 @@ double knn::validate_performance()
             count++;
         }
         data_idx++;
-        std::cout << "Current performance = " << ((double)count * 100)/(data_idx) << "%" << "(" << count << "/" << data_idx << "), k = " << k;
+        std::cout << "Current performance = " << std::setprecision(2) << std::fixed << ((double)count * 100)/(data_idx) << "%" << "(" << count << "/" << data_idx << "), k = " << k;
         auto now = std::chrono::system_clock::now();
         std::time_t current_time = std::chrono::system_clock::to_time_t(now);
         // Convert the time to a string and print it
         std::cout << "\nCurrent time is " << std::ctime(&current_time) << "\r" << "\r" << std::flush;
     }
-    std::cout << "Validation performance = " << ((double)count * 100)/(data_idx) << "%" << " k = " << k << std::endl;
+    std::cout << "Validation performance = " << std::setprecision(2) << std::fixed << ((double)count * 100)/(data_idx) << "%" << " k = " << k << std::endl;
     return ((double)count * 100)/(data_idx);
 }
 double knn::test_performance()
@@ -191,6 +192,6 @@ double knn::test_performance()
             count++;
         }
     }
-    std::cout << "Test performance = " << ((double)count * 100)/(test_data->size()) << "%" << std::endl;
+    std::cout << "Test performance = " << std::setprecision(2) << std::fixed << ((double)count * 100)/(test_data->size()) << "%" << std::endl;
     return ((double)count * 100)/(test_data->size());
 }
