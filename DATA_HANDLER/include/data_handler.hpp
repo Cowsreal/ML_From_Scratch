@@ -2,6 +2,7 @@
 #define __DATA_HANDLER_H
 
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <string>
 #include <map>
@@ -14,6 +15,7 @@ public:
     data_handler();
     ~data_handler();
 
+    void read_csv(std::string path, std::string delimiter);
     void read_feature_vector(std::string path);
     void read_feature_labels(std::string path);
     void split_data();
@@ -28,6 +30,7 @@ public:
     std::vector<data *> * get_test_data();
     std::vector<data *> * get_validation_data();
     int get_class_counts();
+    void normalize();
 
 private:
     double TRAIN_SET_PERCENT;
@@ -41,7 +44,8 @@ private:
 
     int num_classes;
     int feature_vector_size;
-    std::map<uint8_t, int> class_map;
+    std::map<uint8_t, int> class_map_int;
+    std::map<std::string, int> class_map_str;
 };
 
 

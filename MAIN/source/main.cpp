@@ -92,3 +92,33 @@ int main()
     std::cout << "Test Performance: " << std::setprecision(2) << std::fixed << performance << "%, k = " << best_k <<std::endl;
 }
 #endif
+
+#ifdef NEURAL_NETWORK
+int main()
+{
+    data_handler *dh = new data_handler();
+#ifdef MNIST
+    dh->read_feature_vector("C:/Users/mzhan/Documents/GitHub/ML_From_Scratch/data/train-images.idx3-ubyte");
+    dh->read_feature_labels("C:/Users/mzhan/Documents/GitHub/ML_From_Scratch/data/train-labels.idx1-ubyte");
+    dh->count_classes();
+#elif IRIS
+    dh->read_csv("../data/iris.data", ",");
+#endif
+    dh->split_data();
+    std::vector<int> hiddenLayers = {10};
+    auto lambda = [&]() {
+        network* net = new network(
+            hiddenLayers, 
+            (*(dh->get_training_data()))[0]->get_normalized_feature_vector()->size(), 
+            dh->get_class_counts(),
+            0.25, 1);
+        net->set_training_data(dh->get_training_data());
+        net->set_test_data(dh->get_test_data());
+        net->set_validation_data(dh->get_validation_data());
+        net->train(15);
+        net->validate();
+        std::cout << "Test Performance: " << std::setprecision(2) << std::fixed << net->test() << "%" << std::endl;
+    };
+    lambda();
+}
+#endif

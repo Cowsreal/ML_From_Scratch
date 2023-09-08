@@ -22,6 +22,46 @@ data_handler::~data_handler()
     delete [] validation_data;
 }
 
+void data_handler::read_csv(std::string path, std::string delimiter)
+{
+    num_classes = 0;
+    std::ifstream file(path.c_str());
+    std::string line;
+    while(std::getline(file, line))     //Parse each line
+    {
+        if(line.length() == 0)          //Empty line
+        {
+            continue;
+        }
+        data *d = new data();
+        d->set_feature_vector(new std::vector<double>());
+        size_t position = 0;
+        std::string token;
+        while((position = line.find_first_of(delimiter))!= std::string::npos)       //While there exists a delimiter in the current line
+        {
+            token = line.substr(0, position);                                       //Insert the current token into the current data
+            d->append_to_feature_vector(std::stod(token));
+            line.erase(0, position + delimiter.length());
+        }
+        if(class_map_str.find(line) != class_map_str.end()) //Now, all that's left in line is the class label
+        {
+            d->set_label(class_map_str[line]);
+        }
+        else
+        {
+            class_map_str[line] = num_classes;
+            d->set_label(class_map_str[line]);
+            num_classes++;
+        }
+        data_array->push_back(d);
+    }
+    for(data *d : *data_array)
+    {
+        d->set_class_vector(num_classes);
+    }
+    feature_vector_size = (*data_array)[0]->get_normalized_feature_vector()->size();
+}
+
 void data_handler::read_feature_vector(std::string path)
 {
     uint32_t header[4];// MAGIC NUMBER|NUM IMAGES|ROW SIZE|COLUMN SIZE, header information
@@ -55,7 +95,9 @@ void data_handler::read_feature_vector(std::string path)
                 }
             }
             data_array->push_back(d);
+            data_array->back()->set_class_vector(num_classes);
         }
+        normalize();
         std::cout << "Successfully read and stored feature vectors.\n";
     }
     else
@@ -139,14 +181,22 @@ void data_handler::count_classes()
     int count = 0;
     for(unsigned i = 0; i < data_array->size(); i++)        //Loops over entire data set
     {
-        if(class_map.find((*data_array)[i]->get_label()) == class_map.end())        //If label is not already in map
+        if(class_map_int.find((*data_array)[i]->get_label()) == class_map_int.end())        //If label is not already in map
         {
-            class_map[(*data_array)[i]->get_label()] = count;       //Add label to map
+            class_map_int[(*data_array)[i]->get_label()] = count;       //Add label to map
             (*data_array)[i]->set_enumeratedlabel(count);       //Set label to enumerated version of label
             count++;
         }
+        else
+        {
+        (*data_array)[i]->set_enumeratedlabel(class_map_int[(*data_array)[i]->get_label()]);       //Set
+        }  
     }
     num_classes = count;
+    for(data * data : *data_array)
+    {
+        data->set_class_vector(num_classes);
+    }
     std::cout << "Successfully extracted " << num_classes << " unique classes.\n";
 }
 
@@ -184,4 +234,48 @@ std::vector<data *> * data_handler::get_validation_data()
 int data_handler::get_class_counts()
 {
     return num_classes;
+}
+
+void data_handler::normalize()
+{
+    std::vector<double> mins, maxs;
+    data *d = (*data_array)[0];
+    for(auto val : *d->get_feature_vector())
+    {
+        mins.push_back(val);
+        maxs.push_back(val);
+    }
+    
+    for(int i = 1; i < data_array->size(); i++)
+    {
+        d = (*data_array)[i];
+        for(int j = 0; j < d->get_feature_vector_size(); j++)
+        {
+            double value = (double) (*d->get_feature_vector())[j];
+            if(value < mins[j])
+            {
+                mins[j] = value; 
+            }
+            if(value > maxs[j])
+            {
+                maxs[j] = value;
+            }
+        }
+    }
+    for(int i = 0; i < data_array->size(); i++)
+    {
+        (*data_array)[i]->set_feature_vector(new std::vector<double>());
+        (*data_array)[i]->set_class_vector(num_classes);
+        for(int j = 0; j < (*data_array)[i]->get_feature_vector_size(); j++)
+        {
+            if(maxs[j] - mins[j] == 0)
+            {
+                (*data_array)[i]->append_to_feature_vector(0.0);   
+            }
+            else
+            {
+                (*data_array)[i]->append_to_feature_vector((double)((*((*data_array)[i]->get_feature_vector()))[j] - mins[j])/(maxs[j]-mins[j]));
+            }
+        }
+    }
 }
