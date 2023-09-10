@@ -1,3 +1,4 @@
+#include <iomanip>
 #include <numeric>
 #include <algorithm>
 #include "network.hpp"
@@ -202,7 +203,7 @@ void network::train(int numEpochs)
             backProp(d);
             updateWeights(d);
         }
-        std::cout << "Epoch: " << i << " Error: " << sumError << std::endl;
+        std::cout << "Epoch: " << i + 1 << " Error: " << sumError << std::endl;
     }
 }
 
@@ -235,7 +236,7 @@ void network::validate()
             numCorrect++;
         }
     }
-    std::cout << "Validation Accuracy: " << numCorrect / count << std::endl;
+    std::cout << "Validation Accuracy: " << std::setprecision(2) << std::fixed << numCorrect / count << "%" << std::endl;
 }
 
 

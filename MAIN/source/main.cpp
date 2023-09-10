@@ -107,16 +107,20 @@ int main()
 #endif
     dh->split_data();
     std::vector<int> hiddenLayers = {10};
+    int input = (*(dh->get_training_data()))[0]->get_normalized_feature_vector()->size();
+    int output = dh->get_class_counts();
+    std::cout << "Input size: " << input << std::endl;
+    std::cout << "Output size: " << output << std::endl;
     auto lambda = [&]() {
         network* net = new network(
             hiddenLayers, 
-            (*(dh->get_training_data()))[0]->get_normalized_feature_vector()->size(), 
-            dh->get_class_counts(),
-            0.25, 1);
+            input, 
+            output,
+            0.001, 0);
         net->set_training_data(dh->get_training_data());
         net->set_test_data(dh->get_test_data());
         net->set_validation_data(dh->get_validation_data());
-        net->train(15);
+        net->train(30);
         net->validate();
         std::cout << "Test Performance: " << std::setprecision(2) << std::fixed << net->test() << "%" << std::endl;
     };
