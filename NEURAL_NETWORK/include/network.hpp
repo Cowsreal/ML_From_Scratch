@@ -9,7 +9,7 @@
 class network : public common
 {
 public:
-    network(std::vector<int> spec, int, int, double, int);
+    network(std::vector<int> spec, int inputSize, int numClasses, double learningRate, int activationFunction);
     ~network();
     std::vector<double> fProp(data* data);
     double activate(std::vector<double> weight, std::vector<double> prev);

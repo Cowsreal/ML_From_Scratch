@@ -77,10 +77,11 @@ void data_handler::read_feature_vector(std::string path)
             }
         }
         std::cout << "Done getting input file header.\n";
-        int image_size = header[2] * header[3];
+        uint32_t image_size = header[2] * header[3];
         for(int i = 0; i < header[1]; i++)  //Read the rest of the file (images)
         {
             data *d = new data();
+            d->set_feature_vector(new std::vector<uint8_t>());
             uint8_t element[1];
             for(int j = 0; j < image_size; j++)
             {
@@ -93,11 +94,12 @@ void data_handler::read_feature_vector(std::string path)
                     std::cout << "Error reading from file.\n";
                     exit(1);
                 }
+                
             }
             data_array->push_back(d);
-            data_array->back()->set_class_vector(num_classes);
         }
-        normalize();
+        std::cout << "Done reading input file.\n";
+        feature_vector_size = (*data_array)[0]->get_feature_vector()->size();
         std::cout << "Successfully read and stored feature vectors.\n";
     }
     else
@@ -198,6 +200,7 @@ void data_handler::count_classes()
         data->set_class_vector(num_classes);
     }
     std::cout << "Successfully extracted " << num_classes << " unique classes.\n";
+    normalize();
 }
 
 void data_handler::set_train_percent(double train_percent)
@@ -242,21 +245,21 @@ void data_handler::normalize()
     data *d = (*data_array)[0];
     for(auto val : *d->get_feature_vector())
     {
-        mins.push_back(val);
+        mins.push_back(val);                            //Arbitrarily initialize mins and maxs vector with data_array[0]
         maxs.push_back(val);
     }
     
     for(int i = 1; i < data_array->size(); i++)
     {
-        d = (*data_array)[i];
-        for(int j = 0; j < d->get_feature_vector_size(); j++)
+        d = (*data_array)[i];                           //d is the ith data object in data_array
+        for(int j = 0; j < d->get_feature_vector_size(); j++)       //Iterate thru each feature inside the vector
         {
-            double value = (double) (*d->get_feature_vector())[j];
-            if(value < mins[j])
+            double value = (double) (*d->get_feature_vector())[j];  //Get value of the jth feature
+            if(value < mins[j])                                     //Update mins and maxs vectors
             {
                 mins[j] = value; 
             }
-            if(value > maxs[j])
+            if(value > maxs[j])                         
             {
                 maxs[j] = value;
             }
@@ -264,17 +267,20 @@ void data_handler::normalize()
     }
     for(int i = 0; i < data_array->size(); i++)
     {
-        (*data_array)[i]->set_feature_vector(new std::vector<double>());
+        int size = (*data_array)[i]->get_feature_vector_size();
+        std::vector<double>* vect1 = new std::vector<double>(size, 0);
+        (*data_array)[i]->set_feature_vector(vect1);
         (*data_array)[i]->set_class_vector(num_classes);
-        for(int j = 0; j < (*data_array)[i]->get_feature_vector_size(); j++)
+        auto vect = (*data_array)[i]->get_feature_vector();
+        for(int j = 0; j < size; j++)
         {
             if(maxs[j] - mins[j] == 0)
             {
-                (*data_array)[i]->append_to_feature_vector(0.0);   
+                (*data_array)[i]->set_feature_vector_val(j, 0.0);
             }
             else
             {
-                (*data_array)[i]->append_to_feature_vector((double)((*((*data_array)[i]->get_feature_vector()))[j] - mins[j])/(maxs[j]-mins[j]));
+                (*data_array)[i]->set_feature_vector_val(j, (double)(vect->at(j) - mins[j])/(maxs[j]-mins[j]));
             }
         }
     }

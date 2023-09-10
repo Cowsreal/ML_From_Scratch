@@ -29,20 +29,15 @@ void data::append_to_feature_vector(double val)
     normalized_feature_vector->push_back(val);
 }
 
+void data::set_feature_vector_val(int idx, double val)
+{
+    (*normalized_feature_vector)[idx] = val;
+}
+
 void data::set_class_vector(int count)
 {
-    class_vector = new std::vector<int>();
-    for(int i = 0; i < count; i++)
-    {
-        if(i == label)
-        {
-            class_vector->push_back(1);
-        }
-        else
-        {
-            class_vector->push_back(0);
-        }
-    }    
+    class_vector = new std::vector<int>(count, 0);
+    (*class_vector)[label] = 1;
 }
 
 void data::set_label(uint8_t val)

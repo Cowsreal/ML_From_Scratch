@@ -98,9 +98,10 @@ int main()
 {
     data_handler *dh = new data_handler();
 #ifdef MNIST
-    dh->read_feature_vector("C:/Users/mzhan/Documents/GitHub/ML_From_Scratch/data/train-images.idx3-ubyte");
-    dh->read_feature_labels("C:/Users/mzhan/Documents/GitHub/ML_From_Scratch/data/train-labels.idx1-ubyte");
+    dh->read_feature_vector("../data/train-images.idx3-ubyte");
+    dh->read_feature_labels("../data/train-labels.idx1-ubyte");
     dh->count_classes();
+
 #elif IRIS
     dh->read_csv("../data/iris.data", ",");
 #endif

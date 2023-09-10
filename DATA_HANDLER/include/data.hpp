@@ -15,6 +15,7 @@ public:
     void append_to_feature_vector(uint8_t);
     void set_feature_vector(std::vector<double> * vect);
     void append_to_feature_vector(double val);
+    void set_feature_vector_val(int idx, double val);
     void set_class_vector(int count);
     void set_label(uint8_t);
     void set_enumeratedlabel(int);
